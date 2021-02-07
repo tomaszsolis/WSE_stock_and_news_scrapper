@@ -1,0 +1,1 @@
+# WSE_stock_and_news_scrapper
