@@ -48,7 +48,7 @@ def news_scrapper(company):
                     headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
     c = r.content
     soup = BeautifulSoup(c, "html.parser")
-    page = int(soup.find_all("a", {"class": "pages_pos"})[-1].text)
+    page = int(soup.find_all("a", attrs={"class": "pages_pos"})[-1].text)
 
     news=[]
     for page in range(1,int(page)+1):
@@ -58,15 +58,17 @@ def news_scrapper(company):
         soup = BeautifulSoup(c, "html.parser")
         table = soup.find_all("div", {"id": "news-radar-body"})
         for row in table:
-            for col in row.find_all('div',{'class': 'record record-type-NEWS'}):
+            for col in row.find_all('div', attrs={'class': 'record record-type-NEWS'}):
                 n={}
-                for title in col.find_all('div', {'class': "record-header"}):
+                for title in col.find_all('div', attrs={'class': "record-header"}):
                     n["Title"] = title.text.replace('\n','').strip()
-                for lead in col.find_all('div', {"class": "record-body"}):
+                    for link in title.find_all('a',href=True):
+                        n["Link"] = link.get('href')
+                for lead in col.find_all('div', attrs= {"class": "record-body"}):
                     n["Lead"]=lead.text.replace('\n','').replace('\t','').strip()
-                for source in col.find_all('a', {"class": "record-author"}):
+                for source in col.find_all('a', attrs= {"class": "record-author"}):
                     n["Source"]=source.text
-                for date in col.find_all("span",{"class": "record-date"}):
+                for date in col.find_all("span", attrs= {"class": "record-date"}):
                     n["Published"] = date.text
                 news.append(n)
 
