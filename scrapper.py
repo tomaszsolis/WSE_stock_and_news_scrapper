@@ -2,8 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas
 
-"""Script created to scrap news and stock prices from Warsaw Stock Exchange. Data gathered on BiznesRadar.pl"""
+"""Script created to scrap and analyze news and stock prices from Warsaw Stock Exchange. Data gathered on BiznesRadar.pl"""
 
+# Scrapping functions
 def prices_scrapper(company):
     """Scrap stock prices using WSE code."""
 
@@ -56,7 +57,7 @@ def news_scrapper(company):
         r = requests.get(news_url+","+str(page),headers={'User-agent': 'Mozilla/6.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
         c = r.content
         soup = BeautifulSoup(c, "html.parser")
-        table = soup.find_all("div", {"id": "news-radar-body"})
+        table = soup.find_all("div", attrs={"id": "news-radar-body"})
         for row in table:
             for col in row.find_all('div', attrs={'class': 'record record-type-NEWS'}):
                 n={}
@@ -75,7 +76,37 @@ def news_scrapper(company):
     df=pandas.DataFrame(news)
     return df
 
+# Analytics
+def inc_dec(c,o):
+    if c > o:
+        value = "Increase"
+    elif c < o:
+        value = "Decrease"
+    else:
+        value = "Equal"
+    return value
+
+def sma(rolling_interval):
+    df["CloseSMA"+str(rolling_interval)] = df.Close.rolling(rolling_interval, min_periods =1).mean()
+    df["OpenSMA"+str(rolling_interval)] = df.Open.rolling(rolling_interval, min_periods =1).mean()
+
 company = input("Which company are you looking for?: ")
 
-print(prices_scrapper(company))
-print(news_scrapper(company))
+df = prices_scrapper(company)
+news_df = news_scrapper(company)
+
+df["Status"] = [inc_dec(c,o) for c,o in zip(df.Close, df.Open)]
+df["Middle"] = (df.Close+df.Open)/2
+df["Height"] = abs(df.Open-df.Close)
+
+#simple moving average
+sma(20)
+sma(50)
+sma(100)
+
+#expotential moving average
+df["CloseEMA"] = df.Close.ewm(alpha = 0.1, adjust = False).mean()
+df["OpenEMA"] = df.Open.ewm(alpha = 0.1, adjust = False).mean()
+
+print(df)
+print(news_df)
