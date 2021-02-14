@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-import pandas
+import pandas as pd
+import datetime
+from bokeh.plotting import figure, show, output_file
 
 """Script created to scrap and analyze news and stock prices from Warsaw Stock Exchange. Data gathered on BiznesRadar.pl"""
 
@@ -15,7 +17,7 @@ def prices_scrapper(company):
     soup = BeautifulSoup(c, "html.parser")
     page = int(soup.find_all("a", {"class": "pages_pos"})[-1].text)
 
-    temp=[]
+    
     stock_prices=[]
     for page in range(1,int(page)+1):
         #print(stock_url+","+str(page))
@@ -25,11 +27,12 @@ def prices_scrapper(company):
         soup = BeautifulSoup(c, "html.parser")
         table = soup.find_all("table", {"class": "qTableFull"})
         for row in table:
+            temp=[]
             for col in row.find_all('td'):
                 temp.append(col.text)
             for i in range(0,len(temp),7):
                 d = {}
-                d["Date"] = temp[i]
+                d["Date"] = datetime.datetime.strptime(temp[i],'%d.%m.%Y')
                 d["Open"] =float(temp[i+1])
                 d["Max"] = float(temp[i+2])
                 d["Min"] = float(temp[i+3])
@@ -38,7 +41,8 @@ def prices_scrapper(company):
                 d["Value"] = int(temp[i+6].replace(" ",""))
                 stock_prices.append(d)
          
-    df=pandas.DataFrame(stock_prices)
+    df=pd.DataFrame(stock_prices)
+    df = df.set_index("Date")
     return df
 
 def news_scrapper(company):
@@ -73,7 +77,7 @@ def news_scrapper(company):
                     n["Published"] = date.text
                 news.append(n)
 
-    df=pandas.DataFrame(news)
+    df=pd.DataFrame(news)
     return df
 
 # Analytics
@@ -108,5 +112,20 @@ sma(100)
 df["CloseEMA"] = df.Close.ewm(alpha = 0.1, adjust = False).mean()
 df["OpenEMA"] = df.Open.ewm(alpha = 0.1, adjust = False).mean()
 
-print(df)
+#print(df)
 print(news_df)
+
+d = figure(x_axis_type = "datetime", width = 1000, height = 300)
+
+hours_12 = 12 * 60 * 60 * 1000
+
+statuses = {'Increase': 'green', 
+            'Decrease': 'red',
+            'Equal':'grey'}
+
+for status, color in statuses.items():
+    d.rect(df.index[df.Status == status], df.Middle[df.Status == status], hours_12,df.Height[df.Status == status], 
+    fill_color = color, line_color = 'black')
+    
+output_file(company+".html")
+show(d)
