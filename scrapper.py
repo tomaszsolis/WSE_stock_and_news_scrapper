@@ -21,10 +21,6 @@ def prices_scrapper(company):
     stock_prices=[]
     for page in range(1,int(page)+1):
         #print(stock_url+","+str(page))
-        r = requests.get(stock_url+","+str(page), 
-                        headers={'User-agent': 'Mozilla/6.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
-        c = r.content
-        soup = BeautifulSoup(c, "html.parser")
         table = soup.find_all("table", {"class": "qTableFull"})
         for row in table:
             temp=[]
@@ -58,9 +54,6 @@ def news_scrapper(company):
     news=[]
     for page in range(1,int(page)+1):
         #print(news_url+","+str(page))
-        r = requests.get(news_url+","+str(page),headers={'User-agent': 'Mozilla/6.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
-        c = r.content
-        soup = BeautifulSoup(c, "html.parser")
         table = soup.find_all("div", attrs={"id": "news-radar-body"})
         for row in table:
             for col in row.find_all('div', attrs={'class': 'record record-type-NEWS'}):
@@ -94,17 +87,22 @@ def sma(rolling_interval):
     df["CloseSMA"+str(rolling_interval)] = df.Close.rolling(rolling_interval, min_periods =1).mean()
     df["OpenSMA"+str(rolling_interval)] = df.Open.rolling(rolling_interval, min_periods =1).mean()
 
-company = input("Which company are you looking for?: ")
+company = input("Which company are you looking for?: ").upper()
 
-df = prices_scrapper(company)
-news_df = news_scrapper(company)
+try:
+    df = prices_scrapper(company)
+    news_df = news_scrapper(company)
+except:
+    print("Connection error. Please try again later.")
 
+
+#graph - base calculations
 df["Status"] = [inc_dec(c,o) for c,o in zip(df.Close, df.Open)]
 df["Middle"] = (df.Close+df.Open)/2
 df["Height"] = abs(df.Open-df.Close)
 
 #simple moving average
-sma(20)
+sma(25)
 sma(50)
 sma(100)
 
@@ -114,6 +112,8 @@ df["OpenEMA"] = df.Open.ewm(alpha = 0.1, adjust = False).mean()
 
 #print(df)
 print(news_df)
+
+output_file(company+".html")
 
 d = figure(x_axis_type = "datetime", width = 1000, height = 300)
 
@@ -126,6 +126,10 @@ statuses = {'Increase': 'green',
 for status, color in statuses.items():
     d.rect(df.index[df.Status == status], df.Middle[df.Status == status], hours_12,df.Height[df.Status == status], 
     fill_color = color, line_color = 'black')
-    
-output_file(company+".html")
+ 
+
+d.line(df.index, df.CloseSMA25, line_width=1, line_color='green')
+d.line(df.index, df.CloseSMA50, line_width=1, line_color='blue')
+d.line(df.index, df.CloseSMA100, line_width=1, line_color='black')
+
 show(d)
