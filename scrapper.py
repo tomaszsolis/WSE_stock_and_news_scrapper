@@ -163,3 +163,10 @@ print(df)
 print(news_df)
 
 stock_plot(company, df)
+
+# WORK IN PROGRESS
+news_df['Published'] = pd.to_datetime(news_df['Published']).dt.normalize()
+sources_df = news_df[['Source','Published']]
+sources_df[pd.Series(sources_df['Source']).str.contains(pat = 'Infostrefa')] = 'Infostrefa'
+sources_summary = sources_df.groupby('Source', as_index=True).count()
+print(sources_summary)
