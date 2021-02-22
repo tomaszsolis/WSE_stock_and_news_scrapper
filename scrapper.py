@@ -15,9 +15,10 @@ class Scrapper:
         self.rolling_interval = [25,50,100]
 
     # Scrapping functions
-    def prices_scrapper(self):
+    def prices_scrapper(self, days_prior):
         """Scrap stock prices using WSE code."""
-
+        days_prior = int(days_prior) if days_prior != "" else 90
+        date_included = pd.to_datetime(datetime.date.today() - datetime.timedelta(days = days_prior))
         stock_url = "https://www.biznesradar.pl/notowania-historyczne/"+company
         r = requests.get(stock_url,
                         headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
@@ -50,11 +51,14 @@ class Scrapper:
             
         df = pd.DataFrame(stock_prices)
         df = df.set_index("Date")
+        df = df[df.index >= date_included]
         return df
 
-    def news_scrapper(self):
+    def news_scrapper(self, days_prior):
         """Scrap news about the company using WSE code."""
-        
+
+        days_prior = int(days_prior) if days_prior != "" else 90
+        date_included = pd.to_datetime(datetime.date.today() - datetime.timedelta(days = days_prior))
         news_url = "https://www.biznesradar.pl/wiadomosci/"+company
         r = requests.get(news_url,
                         headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
@@ -78,14 +82,16 @@ class Scrapper:
                         for link in title.find_all('a',href=True):
                             n["Link"] = link.get('href')
                     for lead in col.find_all('div', attrs= {"class": "record-body"}):
-                        n["Lead"]=lead.text.replace('\n','').replace('\t','').strip()
+                        n["Lead"] = lead.text.replace('\n','').replace('\t','').strip()
                     for source in col.find_all('a', attrs= {"class": "record-author"}):
-                        n["Source"]=source.text
+                        n["Source"] = source.text
                     for date in col.find_all("span", attrs= {"class": "record-date"}):
-                        n["Published"] = date.text
+                        n["Published"] = datetime.datetime.strptime(date.text,"%Y-%m-%d %H:%M:%S")
                     news.append(n)
 
         df=pd.DataFrame(news)
+        df = df.set_index("Published")
+        df = df[df.index >= date_included]
         return df
 
 class StockAnalytics:
@@ -144,11 +150,11 @@ def stock_plot(company,df):
     
     return d
 
-company = input("Which company are you looking for?: ").upper()
-
 try:
-    df = Scrapper.prices_scrapper(company)
-    news_df = Scrapper.news_scrapper(company)
+    company = input("Which company are you looking for?\n").upper()
+    days_prior = input("How many prior calendar days you want to include? Default is 90 days. \n")
+    df = Scrapper.prices_scrapper(company, days_prior)
+    news_df = Scrapper.news_scrapper(company, days_prior)
 except:
     print("Connection error. Please try again later.")
 
@@ -159,14 +165,12 @@ status(df)
 df["Middle"] = (df.Close+df.Open)/2
 df["Height"] = abs(df.Open-df.Close)  
 
-print(df)
+#print(df)
 print(news_df)
 
-stock_plot(company, df)
+#stock_plot(company, df)
 
 # WORK IN PROGRESS
-news_df['Published'] = pd.to_datetime(news_df['Published']).dt.normalize()
-sources_df = news_df[['Source','Published']]
-sources_df[pd.Series(sources_df['Source']).str.contains(pat = 'Infostrefa')] = 'Infostrefa'
-sources_summary = sources_df.groupby('Source', as_index=True).count()
-print(sources_summary)
+news_df[pd.Series(news_df['Source']).str.contains(pat = 'Infostrefa')] = 'Infostrefa'
+sources_summary = news_df.groupby('Source', as_index=True).count()
+print(sources_summary.columns)
