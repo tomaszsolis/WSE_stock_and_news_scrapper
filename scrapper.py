@@ -166,11 +166,37 @@ df["Middle"] = (df.Close+df.Open)/2
 df["Height"] = abs(df.Open-df.Close)  
 
 #print(df)
-print(news_df)
+#print(news_df)
 
 #stock_plot(company, df)
 
-# WORK IN PROGRESS
+
+############################################################################### 
+# WORK IN PROGRESS - the code needs cleanup. Refactoring fill be done shortly #
+###############################################################################
+
 news_df[pd.Series(news_df['Source']).str.contains(pat = 'Infostrefa')] = 'Infostrefa'
-sources_summary = news_df.groupby('Source', as_index=True).count()
-print(sources_summary.columns)
+sources_summary = news_df['Source'].value_counts()
+#print(sources_summary)
+#print(news_df.describe())
+
+#reset the index
+df = df.reset_index(drop=False)
+news_df = news_df.reset_index(drop=False)
+
+df.Date = pd.to_datetime(df.Date)
+df = df[["Date","Open","Close"]]
+news_df["Date"]= pd.to_datetime(news_df.Published.dt.date)
+news_df = news_df[["Date","Source"]]
+
+#prices at the publication date
+publication = news_df.merge(df, on = "Date")[["Source", "Date", "Open"]]
+#prices at the end of observation + 7 days
+publication["End_Date"] = publication.Date + datetime.timedelta(days = 7)
+df_end = df[["Date","Close"]]
+df_end.rename(columns = {"Date": "End_Date"}, inplace = True)
+news_prices = pd.merge(publication, df_end, on = "End_Date")
+#status check
+status(news_prices)
+
+print(news_prices)
