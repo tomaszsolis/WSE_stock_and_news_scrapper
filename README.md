@@ -15,13 +15,13 @@ Data:
 
 Tools:
     - Python - for webscrapping and analytics
-    - Heroku - cloud platform to store the simple webpage containg the results for sample companies.
 
 # Contents
 
 - [Project Plan](#project-plan)
 - [The Data Set](#the-data-set)
 - [Used Tools](#used-tools)
+- [Guide](#guide)
 - [Demo](#demo)
 - [Conclusion](#conclusion)
 - [Follow Me On](#follow-me-on)
@@ -29,9 +29,7 @@ Tools:
 # Project Plan
 Due to multiple options, I decided to split the project in 2 parts.
 
-Analyze the trends for the stock price 1 week after the publication:
-1) without analyzing the news itself
-2) with analyzing the text (NLP)
+Analyze the trends for the stock price 3 days after the publication (parameter can be changed) after the publication without analyzing the news text.
 
 # The Data Set
 Data is scrapped from Biznesradar.pl and it consists of:
@@ -41,15 +39,39 @@ Data is scrapped from Biznesradar.pl and it consists of:
 I omit popular news portals like wp.pl, onet.pl and similar because of the lack of quality in business news.
 
 # Used Tools
+Python :)
+
+# Guide
+1. Execute the file
+2. Type in the company code (f.e. allegro for Allegro, cd-projekt for CD Project Red etc). Letter size doesn't matter.
+3. Type in the number of prior calendar days to be included. Default value is set for 90 days to prevent messy information for companies which are present on the stock market for a long time (20+ years)
+4. Enjoy the stock price graph with the main indicators (like SMA).
+5. Identify the most reliable news sources based on the price movement after the publication. 
 
 # Demo
-1. Execute the file
-2. Type in the company code (f.e. ALE for Allegro, CDR for CD Project Red etc).
-3. Type in the number of prior calendar days to be included. Default value is set for 90 days to prevent messy information for companies which are present on the stock market for a long time. 
-4. Enjoy the basic stock price graph with the main indicators (like SMA).
-5. <work in progress> News analytics
+
+CD Project Red analysis
+
+1. Run the script
+2. Type in the company code
+    -> type in cd-projekt
+3. Type in the number of prior calendar days to be included.
+    -> 365
+4. Enjoy the stock price graph with the main indicators (like SMA).
+5. Identify the most reliable news sources based on the price movement after the publication. 
+
+                    News_count      Price_increase     Price_decrease  Positive_pct     Negative_pct  
+Source                                                                        
+Infostrefa                124            45.0              79               36.0            64.0
+bankier.pl                 72            28.0              44               39.0            61.0
+money.pl                   67            28.0              39               42.0            58.0
+wnp.pl                     48            19.0              29               40.0            60.0
 
 # Conclusion
+    It turns out that news published in some media more often that others result in stock price drop.
+    Is it fair? No. 
+    So why does it happen? Internet media are driven by clicks. negative news are more clickable than positive ones. So every publisher tries to beat the others. Even most respectable portals fall for such issue. That's why it is crucial to pick the source for your news wisely (not only for investing).
+    
 
 # Follow Me On
 https://www.linkedin.com/in/tomaszsolis/
