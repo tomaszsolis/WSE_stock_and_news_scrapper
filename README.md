@@ -59,12 +59,12 @@ CD Project Red analysis
 4. Enjoy the stock price graph with the main indicators (like SMA).
 5. Identify the most reliable news sources based on the price movement after the publication. 
     -> you will be presented a table with:
-            - a news portal,
-            - number of publications about a given company
-            - number of news with price increase in the next 3 calendar days
-            - number of news with price decrease in the next 3 calendar days
-            - percentage of news with the price increase
-            - percentage of news with the price decrease
+    - a news portal,
+    - number of publications about a given company
+    - number of news with price increase in the next 3 calendar days
+    - number of news with price decrease in the next 3 calendar days
+    - percentage of news with the price increase
+    - percentage of news with the price decrease
 
 # Conclusion
 
@@ -72,7 +72,7 @@ It turns out that news published in some media more often that others result in 
 Is it fair? No. 
 So why does it happen? Internet media are driven by clicks. negative news are more clickable than positive ones. So every publisher tries to beat the others. Even most respectable portals fall for such issue. That's why it is crucial to pick the source for your news wisely (not only for investing).
 
-But it is possible to react to the news on a certain portal given you know the sentiment of the portal towards a company. 
+But it is possible to react to the news on a certain portal given you know the sentiment of the portal towards a company. To fill in all the blanks and fully understand how positive/negative the news is, a more comprehensive sentiment analysis should be done. I have included the links to the news in the news scrapping part of the code. Current project will be expanded in the future to include NLP analysis using Naive Bayes classifier and Neural Networks. 
 
 # Follow Me On
 https://www.linkedin.com/in/tomaszsolis/
