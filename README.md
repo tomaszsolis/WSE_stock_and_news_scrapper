@@ -8,7 +8,6 @@ As I am investing on Warsw Stock Exchange (WSE), I noticed that price rises and 
 To do that I would like to answer the following questions:
 1) Is it possible to react to news before they impact the prices? 
 2) Are certain portal more negative or positive towards certain companies?
-3) Is it possible to predict the general trend for stock prices based on the sentiment analysis of the news?
 
 Data: 
     - biznesradar.pl not only has the information about the stock prices but also gathers the information from most important business news portals.
@@ -59,19 +58,21 @@ CD Project Red analysis
     -> 365
 4. Enjoy the stock price graph with the main indicators (like SMA).
 5. Identify the most reliable news sources based on the price movement after the publication. 
-
-                    News_count      Price_increase     Price_decrease  Positive_pct     Negative_pct  
-Source                                                                        
-Infostrefa                124            45.0              79               36.0            64.0
-bankier.pl                 72            28.0              44               39.0            61.0
-money.pl                   67            28.0              39               42.0            58.0
-wnp.pl                     48            19.0              29               40.0            60.0
+    -> you will be presented a table with:
+            - a news portal,
+            - number of publications about a given company
+            - number of news with price increase in the next 3 calendar days
+            - number of news with price decrease in the next 3 calendar days
+            - percentage of news with the price increase
+            - percentage of news with the price decrease
 
 # Conclusion
-    It turns out that news published in some media more often that others result in stock price drop.
-    Is it fair? No. 
-    So why does it happen? Internet media are driven by clicks. negative news are more clickable than positive ones. So every publisher tries to beat the others. Even most respectable portals fall for such issue. That's why it is crucial to pick the source for your news wisely (not only for investing).
-    
+
+It turns out that news published in some media more often that others result in stock price drop.
+Is it fair? No. 
+So why does it happen? Internet media are driven by clicks. negative news are more clickable than positive ones. So every publisher tries to beat the others. Even most respectable portals fall for such issue. That's why it is crucial to pick the source for your news wisely (not only for investing).
+
+But it is possible to react to the news on a certain portal given you know the sentiment of the portal towards a company. 
 
 # Follow Me On
 https://www.linkedin.com/in/tomaszsolis/
